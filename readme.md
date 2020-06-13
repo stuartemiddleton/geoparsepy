@@ -40,7 +40,7 @@ A benchmark geoparse dataset is also available for free from the University of S
 
 # geoparsepy documentation resources
 
-geoparsepy [API](https://pythonhosted.org/geoparsepy/index.html)
+geoparsepy [API](https://github.com/stuartemiddleton/geoparsepy/api)
 geoparsepy example code on [github](https://github.com/stuartemiddleton/geoparsepy)
 
 
