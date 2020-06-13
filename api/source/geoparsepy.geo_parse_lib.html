@@ -1,0 +1,609 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>geoparsepy.geo_parse_lib module &#8212; geoparsepy 2.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-geoparsepy.geo_parse_lib">
+<span id="geoparsepy-geo-parse-lib-module"></span><h1>geoparsepy.geo_parse_lib module<a class="headerlink" href="#module-geoparsepy.geo_parse_lib" title="Permalink to this headline">¶</a></h1>
+<dl class="simple">
+<dt>Geoparsing is based on named entity matching against OpenStreetMap (OSM) locations. All locations with names that match tokens will be selected from a target text sentence. This will result in a set of OSM locations, all with a common name or name variant, for each token in the text. Geoparsing included the following features:</dt><dd><ul class="simple">
+<li><p><em>token expansion</em> using location name variants (i.e. OSM multi-lingual names, short names and acronyms)</p></li>
+<li><p><em>token expansion</em> using location type variants (e.g. street, st.)</p></li>
+<li><p><em>token filtering</em> of single token location names against WordNet (non-nouns), language specific stoplists and peoples first names (nltk.corpus.names.words()) to reduce false positive matches</p></li>
+<li><p><em>prefix checking</em> when matching in case a first name prefixes a location token(s) to avoid matching peoples full names as locations (e.g. Victoria Derbyshire != Derbyshire)</p></li>
+</ul>
+</dd>
+<dt>Location disambiguation is the process of choosing which of a set of possible OSM locations, all with the same name, is the best match. Location disambiguation is based on an evidential approach, with evidential features detailed below in order of importance:</dt><dd><ul class="simple">
+<li><p><em>token subsumption</em>, rejecting smaller phrases over larger ones (e.g. ‘New York’ will prefer [New York, USA] to [York, UK])</p></li>
+<li><p><em>nearby parent region</em>, preferring locations with a parent region also appearing within a semantic distance (e.g. ‘New York in USA’ will prefer [New York, USA] to [New York, BO, Sierra Leone])</p></li>
+<li><p><em>nearby locations</em>, perferring locations with closeby or overlapping locations within a semantic distance (e.g. ‘London St and Commercial Road’ will select from road name choices with the same name based on spatial proximity)</p></li>
+<li><p><em>nearby geotag</em>, perferring locations that are closeby or overlapping a geotag</p></li>
+<li><p><em>general before specific</em>, rejecting locations with a higher admin level (or no admin level at all) compared to locations with a lower admin level (e.g. ‘New York’ will prefer [New York, USA] to [New York, BO, Sierra Leone]</p></li>
+</ul>
+</dd>
+<dt>Currently the following languages are supported:</dt><dd><ul class="simple">
+<li><p>English, French, German, Italian, Portuguese, Russian, Ukrainian</p></li>
+<li><p>All other languages will work but there will be no language specific token expansion available</p></li>
+</ul>
+</dd>
+</dl>
+<p>This geoparsing algorithm uses a large memory footprint, proportional to the number of cached locations, to maximize matching speed. It can be naively parallelized, with multiple geoparse processes loaded with different sets of locations and the geoparse results aggregated in a last process where location disambiguation is applied. This approach has been validated across an APACHE Storm cluster.</p>
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.calc_OSM_linkedgeodata_uri">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">calc_OSM_linkedgeodata_uri</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tuple_osmid</span></em>, <em class="sig-param"><span class="n">geom</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#calc_OSM_linkedgeodata_uri"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.calc_OSM_linkedgeodata_uri" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a linkedgeodata URI for this OSMID (first ID in tuple only)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tuple_osmid</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#tuple" title="(in Python v3.7)"><em>tuple</em></a>) – tuple of OSM IDs that represent this location. locations such as roads can have multiple OSM IDs which represent different ways along the length of the road.</p></li>
+<li><p><strong>geom</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – serialized OpenGIS geometry object e.g. ‘POINT( lon lat )’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>URI to linkedgeodata for first OSM ID in tuple</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.calc_OSM_type">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">calc_OSM_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dict_osm_tags</span></em>, <em class="sig-param"><span class="n">dict_geospatial_config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#calc_OSM_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.calc_OSM_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>calc the OSM tags to work out the type of OSM location. this is especialy useful for high level filtering and visualization as OSM tags are quite detailed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dict_osm_tags</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – OSM tags for this location</p></li>
+<li><p><strong>dict_geospatial_config</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – config object returned from geoparse_lib.get_geoparse_config()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>transport | building | admin | other</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.calc_OSM_uri">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">calc_OSM_uri</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tuple_osmid</span></em>, <em class="sig-param"><span class="n">geom</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#calc_OSM_uri"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.calc_OSM_uri" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a openstreetmap URI for this OSMID (first ID in tuple only)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tuple_osmid</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#tuple" title="(in Python v3.7)"><em>tuple</em></a>) – tuple of OSM IDs that represent this location. locations such as roads can have multiple OSM IDs which represent different ways along the length of the road.</p></li>
+<li><p><strong>geom</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – serialized OpenGIS geometry object e.g. ‘POINT( lon lat )’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>URI to linkedgeodata for first OSM ID in tuple</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.calc_best_osm_name">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">calc_best_osm_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_lang</span></em>, <em class="sig-param"><span class="n">dict_osm_tags</span></em>, <em class="sig-param"><span class="n">dict_geospatial_config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#calc_best_osm_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.calc_best_osm_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a location name in a target language or best next alternative. the default name is the name in the native language of the region.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_lang</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – language code of preference for name</p></li>
+<li><p><strong>dict_osm_tags</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – OSM tags for this location</p></li>
+<li><p><strong>dict_geospatial_config</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – config object returned from geo_parse_lib.get_geoparse_config()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>location name</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>unicode</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.calc_geom_index">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">calc_geom_index</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">list_data</span></em>, <em class="sig-param"><span class="n">index_geom</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">index_id</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">index_osm_tag</span><span class="o">=</span><span class="default_value">5</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#calc_geom_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.calc_geom_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>compile an index of shapely geoms from a list of data where one column is a geom. there can be several geom for each osmid as island groups can have a geom per island, but still have a single osmid and name (e.g. Shetland, UK).
+the key for this index will either be the original data list row number OR the value from an ID column if provided.
+a OSM tag column can optionally be provided to append OSM tag data to the end of the geom index entry, which can be useful for determining the location type each geom refers to (e.g. admin region, road)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_data</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – list of data rows where one of the column contains a serialized OpenGIS geom</p></li>
+<li><p><strong>index_geom</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – column index in list of data for geom</p></li>
+<li><p><strong>index_id</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – column index in list of data for id (can be None)</p></li>
+<li><p><strong>index_osm_tag</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – column index in list of data for OSM tag dict (can be None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dict of { id : [ ( shapely_geom_prepared, shapely_envelope, shapely_geom, shapely_representative_point, dict_OSM_tag, geom_serialized ), …] }</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.calc_inverted_index">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">calc_inverted_index</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">list_data</span></em>, <em class="sig-param"><span class="n">dict_geospatial_config</span></em>, <em class="sig-param"><span class="n">index_phrase</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">index_id</span><span class="o">=</span><span class="default_value">2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#calc_inverted_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.calc_inverted_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>compile an inverted index from a list of arbirary data where one column is a phrase string. the inverted index key is the phrase as a tokenized tuple e.g. (‘new’,’york’). the inverted index value is an ID value linking back to the original list of data e.g. OSM ID tuple or just a row index.
+| note: the default index values are preset for the list of cached locations from geo_preprocess_lib.cache_preprocessed_locations()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_data</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – list of data to create an inverted index for e.g. result of geo_preprocess_lib.cache_preprocessed_locations()</p></li>
+<li><p><strong>dict_geospatial_config</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – config object returned from geo_parse_lib.get_geoparse_config()</p></li>
+<li><p><strong>index_phrase</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – column index in list_data of phrase text to use as a key for inverted index (str/unicode OR list/tuple of str/unicode)</p></li>
+<li><p><strong>index_id</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – column index in list_data of an ID that the inverted index will point to (str/unicode/list/tuple). A value of None will mean the list_data row index is used as an ID</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>inverted index where key = phrase as a tuple, value = ID value for original data list</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.calc_location_confidence">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">calc_location_confidence</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">list_loc</span></em>, <em class="sig-param"><span class="n">dict_geospatial_config</span></em>, <em class="sig-param"><span class="n">index_token_start</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">index_token_end</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">index_osm_id</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">index_osm_parents</span><span class="o">=</span><span class="default_value">7</span></em>, <em class="sig-param"><span class="n">index_osm_tags</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">semantic_distance</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">index_geom</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">geom_distance</span><span class="o">=</span><span class="default_value">0.25</span></em>, <em class="sig-param"><span class="n">index_loc_tokens</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">confidence_tests</span><span class="o">=</span><span class="default_value">1, 2, 3, 4</span></em>, <em class="sig-param"><span class="n">geom_context</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">geom_cache</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#calc_location_confidence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.calc_location_confidence" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate confidence values for a set of location matches originating from a concatenated set of geo_parse_lib.geoparse_token_set() results</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_loc</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – list of locations with geom information from geo_parse_lib.create_matched_location_list()</p></li>
+<li><p><strong>dict_geospatial_config</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – config object returned from geo_parse_lib.get_geoparse_config()</p></li>
+<li><p><strong>index_token_start</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of matched token start position in list_loc</p></li>
+<li><p><strong>index_token_end</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of matched token end position in list_loc</p></li>
+<li><p><strong>index_osm_id</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of OSM ID in list_loc</p></li>
+<li><p><strong>index_osm_parents</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of OSM ID of super regions to this matches location in list_loc</p></li>
+<li><p><strong>index_osm_tags</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of OSM tags in list_loc</p></li>
+<li><p><strong>semantic_distance</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of tokens (left and right) to look for semantically nearby location checks e.g. ‘London in UK’</p></li>
+<li><p><strong>index_geom</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of serialized OpenGIS geom in list_loc</p></li>
+<li><p><strong>geom_distance</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – distance for shapely distance check (in degrees)</p></li>
+<li><p><strong>index_loc_tokens</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of matched loc tokens</p></li>
+<li><p><strong>confidence_tests</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – confidence check tests to run when calculating a confidence value. 1 = token subsumption, 2 = nearby parent region, 3 = nearby locations and nearby geotag, 4 = general before specific</p></li>
+<li><p><strong>geom_cache</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – cache of geom checks with distance and intersection results to avoid running the same shapely checks twice. this cache will be populated with any new geoms that are checked using shapely so might get large over time. e.g. dict{ strGeom : [ set(close_tuple_IDs), set(not_close_tuple_IDs), set(intersects_tuple_IDs), set(not_intersects_tuple_IDs) ] }</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a list of confidence values (0..300) for each location in list_loc. locations with a common token can be ranked by confidence and the highest value taken. a confidence of 0 means the location should be rejected regardless. closeby locations scores 2+. super regions present in text scores 10+. geocontext intersects location scores 200+ and closeness scores 100+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.calc_multilingual_osm_name_set">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">calc_multilingual_osm_name_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dict_osm_tags</span></em>, <em class="sig-param"><span class="n">dict_geospatial_config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#calc_multilingual_osm_name_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.calc_multilingual_osm_name_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a list of name variants from the OSM tag set for a location. this will include the name, alternative and short names, abreviations and languages variants</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dict_osm_tags</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – OSM tags for this location</p></li>
+<li><p><strong>dict_geospatial_config</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – config object returned from geo_parse_lib.get_geoparse_config()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of name variants for this location</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.calc_osmid_lookup">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">calc_osmid_lookup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cached_locations</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#calc_osmid_lookup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.calc_osmid_lookup" title="Permalink to this definition">¶</a></dt>
+<dd><p>create an index of osmid to row indexes in the cached_locations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cached_locations</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – list of cached locations from geo_preprocess_lib.cache_preprocessed_locations()</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>lookup table mapping an osmid to a set of rows in the cached locations (osmids can many entries each with a different geom such as island groups)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.create_matched_location_list">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">create_matched_location_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">list_match</span></em>, <em class="sig-param"><span class="n">cached_locations</span></em>, <em class="sig-param"><span class="n">osmid_lookup</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#create_matched_location_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.create_matched_location_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a list of locations based on a set of matches and the original cached location table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_match</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – list of location matches from geo_parse_lib.geoparse_token_set()</p></li>
+<li><p><strong>cached_locations</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – list of cached locations from geo_preprocess_lib.cache_preprocessed_locations()</p></li>
+<li><p><strong>osmid_lookup</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – lookup table mapping an osmid to a set of rows in the cached locations from geo_parse_lib.calc_osmid_lookup()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of matched locations with all of the geom information e.g. [[&lt;loc_id&gt;, &lt;token_start&gt;, &lt;token_end&gt;, loc_tokens, geom, (&lt;osm_id&gt;, …), {&lt;osm_tag&gt;:&lt;value&gt;}*N_tags, (&lt;osm_id_parent&gt;, …)] …]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.expand_hashtag">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">expand_hashtag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">phrase</span></em>, <em class="sig-param"><span class="n">dict_geospatial_config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#expand_hashtag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.expand_hashtag" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a hashtag for a phrase (expects clean phrase text)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phrase</strong> (<em>unicode</em>) – OSM location phrase to check if it makes a good place name</p></li>
+<li><p><strong>dict_geospatial_config</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – config object returned from geoparse_lib.get_geoparse_config()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>hashtag text</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>unicode</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.expand_osm_alternate_names">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">expand_osm_alternate_names</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tuple_osmid</span></em>, <em class="sig-param"><span class="n">phrase</span></em>, <em class="sig-param"><span class="n">dict_osm_tags</span></em>, <em class="sig-param"><span class="n">dict_geospatial_config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#expand_osm_alternate_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.expand_osm_alternate_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a list of location names expanded to include OSM ref, alt, language variants, street and building type variants etc. for example ‘London St’ will generate [‘London Street’, ‘London St’].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tuple_osmid</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#tuple" title="(in Python v3.7)"><em>tuple</em></a>) – tuple of OSM IDs that represent this location. locations such as roads can have multiple OSM IDs which represent different ways along the length of the road.</p></li>
+<li><p><strong>phrase</strong> (<em>unicode</em>) – cleaned name (not stemmed) of OSM location which should be expanded</p></li>
+<li><p><strong>dict_osm_tags</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – OSM tags for this location</p></li>
+<li><p><strong>dict_geospatial_config</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – config object returned from geoparse_lib.get_geoparse_config()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of name variants for this location phrase (including the original phrase itself)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.expand_osm_location_types">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">expand_osm_location_types</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">list_location_names</span></em>, <em class="sig-param"><span class="n">dict_location_types</span></em>, <em class="sig-param"><span class="n">dict_osm_tags</span></em>, <em class="sig-param"><span class="n">dict_geospatial_config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#expand_osm_location_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.expand_osm_location_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>given an set of location names return an expanded list with all known location type name variants. the original location name will always appear in the variant list.
+e.g. [‘london st’] -&gt; [[ ‘london st’, ‘london street’ ]]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_location_names</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – list of clean location phrase variants for this location (e.g. full name, short name and abbreviation)</p></li>
+<li><p><strong>dict_location_types</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – dict of types prefixes and type variants in form { ‘title’ : listTypePattern, ‘type’ : listTypePattern }. listTypePattern is generated using read_location_type_corpus()</p></li>
+<li><p><strong>dict_osm_tags</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – OSM tags for this location</p></li>
+<li><p><strong>dict_geospatial_config</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – config object returned from geoparse_lib.get_geoparse_config()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>expanded list of location phrase variants</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.filter_matches_by_confidence">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">filter_matches_by_confidence</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">list_loc</span></em>, <em class="sig-param"><span class="n">dict_geospatial_config</span></em>, <em class="sig-param"><span class="n">index_token_start</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">index_token_end</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">index_osm_id</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">index_osm_parents</span><span class="o">=</span><span class="default_value">7</span></em>, <em class="sig-param"><span class="n">index_osm_tags</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">semantic_distance</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">index_geom</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">geom_distance</span><span class="o">=</span><span class="default_value">0.25</span></em>, <em class="sig-param"><span class="n">index_loc_tokens</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">confidence_tests</span><span class="o">=</span><span class="default_value">1, 2, 3, 4</span></em>, <em class="sig-param"><span class="n">geom_context</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">geom_cache</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#filter_matches_by_confidence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.filter_matches_by_confidence" title="Permalink to this definition">¶</a></dt>
+<dd><p>filter a list of matches by match confidence using geo_parse_lib.calc_location_confidence() scores. only the highest ranked locations for each token will be kept, with the others removed from the list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_loc</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – list of locations with geom information from geo_parse_lib.create_matched_location_list(). this list will be filtered with rows removed that rank low on match confidence.</p></li>
+<li><p><strong>dict_geospatial_config</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – config object returned from geo_parse_lib.get_geoparse_config()</p></li>
+<li><p><strong>index_token_start</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of matched token start position in list_loc</p></li>
+<li><p><strong>index_token_end</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of matched token end position in list_loc</p></li>
+<li><p><strong>index_osm_id</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of OSM ID in list_loc</p></li>
+<li><p><strong>index_osm_parents</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of OSM ID of super regions to this matches location in list_loc</p></li>
+<li><p><strong>index_osm_tags</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of OSM tags in list_loc</p></li>
+<li><p><strong>semantic_distance</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of tokens (left and right) to look for semantically nearby location checks e.g. ‘London in UK’</p></li>
+<li><p><strong>index_geom</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of serialized OpenGIS geom in list_loc</p></li>
+<li><p><strong>geom_distance</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – distance for shapely distance check (in degrees)</p></li>
+<li><p><strong>index_loc_tokens</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of matched loc tokens</p></li>
+<li><p><strong>confidence_tests</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – confidence check tests to run when calculating a confidence value. 1 = token subsumption, 2 = nearby parent region, 3 = nearby locations and nearby geotag, 4 = general before specific</p></li>
+<li><p><strong>geom_cache</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – cache of geom checks with distance and intersection results to avoid running the same shapely checks twice. this cache will be populated with any new geoms that are checked using shapely so might get large over time. e.g. dict{ strGeom : [ set(close_tuple_IDs), set(not_close_tuple_IDs), set(intersects_tuple_IDs), set(not_intersects_tuple_IDs) ] }</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a list of confidence values (0..20) for each location in list_loc. locations with a common token can be ranked by confidence and the highest value taken. a confidence of 0 means the location should be rejected regardless. semantically close locations provide scores 1+. geotags inside locations provide scores 10+.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.filter_matches_by_geom_area">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">filter_matches_by_geom_area</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">list_loc</span></em>, <em class="sig-param"><span class="n">dict_geospatial_config</span></em>, <em class="sig-param"><span class="n">index_token_start</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">index_token_end</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">index_osm_id</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">index_geom</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">same_osmid_only</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#filter_matches_by_geom_area"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.filter_matches_by_geom_area" title="Permalink to this definition">¶</a></dt>
+<dd><p>filter a list of matches to favour locations with the largest area (e.g. liverpool city border &gt; liverpool admin centre point, liverpool city in UK &gt; liverpool suburb in AU). this is helpful to choose a single
+match from a list of matches with same confidence as nomrally people are referring to the larger more populated area</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_loc</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – list of locations with geom information from geo_parse_lib.create_matched_location_list(). this list will be filtered with rows removed that do not have parents in the region of interest</p></li>
+<li><p><strong>dict_geospatial_config</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – config object returned from geo_parse_lib.get_geoparse_config()</p></li>
+<li><p><strong>index_token_start</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of matched token start position in list_loc</p></li>
+<li><p><strong>index_token_end</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of matched token end position in list_loc</p></li>
+<li><p><strong>index_osm_id</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of OSM ID in list_loc</p></li>
+<li><p><strong>index_geom</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of serialized OpenGIS geom in list_loc</p></li>
+<li><p><strong>same_osmid_only</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – if True limit loc removal to same OSMIDs i.e. remove smaller geoms for same OSMID if several geoms matched (e.g. admin nodes and city polygons or several island polygons)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.filter_matches_by_region_of_interest">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">filter_matches_by_region_of_interest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">list_loc</span></em>, <em class="sig-param"><span class="n">list_regions_of_interest</span></em>, <em class="sig-param"><span class="n">dict_geospatial_config</span></em>, <em class="sig-param"><span class="n">index_osm_parents</span><span class="o">=</span><span class="default_value">7</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#filter_matches_by_region_of_interest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.filter_matches_by_region_of_interest" title="Permalink to this definition">¶</a></dt>
+<dd><p>filter a list of matches by region of interest. all locations who do not have a parent in the region of interest list will be removed from the list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_loc</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – list of locations with geom information from geo_parse_lib.create_matched_location_list(). this list will be filtered with rows removed that do not have parents in the region of interest</p></li>
+<li><p><strong>list_regions_of_interest</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – list of OSM IDs for regions of interest</p></li>
+<li><p><strong>dict_geospatial_config</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – config object returned from geo_parse_lib.get_geoparse_config()</p></li>
+<li><p><strong>index_osm_parents</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index of OSM ID of super regions to this matches location in list_loc</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.geoparse_token_set">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">geoparse_token_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">token_set</span></em>, <em class="sig-param"><span class="n">dict_inverted_index</span></em>, <em class="sig-param"><span class="n">dict_geospatial_config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#geoparse_token_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.geoparse_token_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>geoparse token sets using a set of cached locations. no location disambiguation is performed here so all possible location matches will be returned for each token</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token_set</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – list of tokens to geoparse</p></li>
+<li><p><strong>dict_inverted_index</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – inverted index of cached locations from soton_corenlppy.common_parse_lib.calc_inverted_index()</p></li>
+<li><p><strong>dict_geospatial_config</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – config object returned from geo_parse_lib.get_geoparse_config()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of location indexes for each matched phrase [ [ (token_start, token_end, set(doc_index1, doc_index2 …), matched_tokens), … ], … ]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.get_geoparse_config">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">get_geoparse_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#get_geoparse_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.get_geoparse_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a geospatial config object for this specific set of languages. the config object contains an instantiated NLTK stemmer, tokenizer and settings tailored for the chosen language set. all available language specific corpus will be read into memory, such as street name variants. 
+geoparse config settings are below:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><em>lower_tokens</em> = True, since locations are not alweays referenced in text as capitalized Proper Nouns (overrides variable keyword args)</p></li>
+<li><p><em>building_types</em> = dict, containing building type name variants loaded from each selected language’s corpus file</p></li>
+<li><p><em>street_types</em> = dict, containing street type name variants loaded from each selected language’s corpus file</p></li>
+<li><p><em>admin_types</em> = dict, containing admin region type name variants loaded from each selected language’s corpus file</p></li>
+<li><p><em>gazeteers</em> = dict, containing local gazateer name variants not provided in the OSM database for specific OSM IDs</p></li>
+<li><p><em>use_wordnet</em> = True, remove 1 token location names that appear in wordnet with non location meanings</p></li>
+</ul>
+</div></blockquote>
+<div class="line-block">
+<div class="line">note: for a list of default config settings see soton_corenlppy.common_parse_lib.get_common_config()</div>
+<div class="line">note: a config object approach is used, as opposed to a global variable, to allow geo_parse_lib functions to work in a multi-threaded environment</div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – variable argument to override any default config values</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>configuration settings to be used by all geo_parse_lib functions</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.is_good_place_name">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">is_good_place_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">phrase</span></em>, <em class="sig-param"><span class="n">dict_osm_tags</span></em>, <em class="sig-param"><span class="n">dict_geospatial_config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#is_good_place_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.is_good_place_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>check if a phrase is a good placename (building, street, admin region etc.) for use in text matching. the OSM database contains some building names that are really house numbers (e.g. 50) and a few basic mistakes which need to be pruned to avoid poor quality matches.
+rejects short names, only numbers, only stoplist names.
+accepts short highway names e.g. ‘M3’ and multi-token admin regions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phrase</strong> (<em>unicode</em>) – OSM location phrase to check if it makes a good place name</p></li>
+<li><p><strong>dict_osm_tags</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – OSM tags for this location</p></li>
+<li><p><strong>dict_geospatial_config</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – config object returned from geoparse_lib.get_geoparse_config()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if this is a good location name, False if it should be rejected for token matching</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.read_location_type_corpus">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">read_location_type_corpus</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">dict_geospatial_config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#read_location_type_corpus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.read_location_type_corpus" title="Permalink to this definition">¶</a></dt>
+<dd><p>read a location type corpus containing information for location prefix variants (e.g. north london) and location type name variants (e.g. london street, london st)</p>
+<div class="line-block">
+<div class="line">note : variants are encoded as a list [ [ (‘prefix’ | ‘suffix’ | ‘both’, token, token … ) … ], … ]</div>
+<div class="line-block">
+<div class="line">e.g. [ [ (‘suffix’,’clinic’), (‘suffix’,’day’,’centre’) ], [ (‘both’,’uni’),(‘both’,’university’) ] ]</div>
+</div>
+</div>
+<div class="line-block">
+<div class="line">corpus file syntax :</div>
+<div class="line-block">
+<div class="line">title, … for location title words not part of the type (e.g. north)</div>
+<div class="line">type, … for location type types (e.g. hospital)</div>
+<div class="line"># for comments</div>
+<div class="line">+&lt;phrase&gt; = prefix to location name</div>
+<div class="line">&lt;phrase&gt;+ = suffix to location name</div>
+<div class="line">+&lt;phrase&gt;+ = can be both prefix and suffix</div>
+<div class="line">tokens starting with a ‘*’ indicate that the phrase is not to be used for initial match, but will used for expansion variants</div>
+<div class="line">e.g. primary, <a href="#id1"><span class="problematic" id="id2">*</span></a>school –&gt; matches only ‘&lt;name&gt; primary’ BUT will expand to ‘&lt;name&gt; primary’, ‘&lt;name&gt; school’ since there are other types of school that could match eroneously</div>
+</div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – filename of location type corpus</p></li>
+<li><p><strong>dict_geospatial_config</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – config object returned from geoparse_lib.get_geoparse_config()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of prefix variants and type variants</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_parse_lib.reverse_geocode_geom">
+<code class="sig-prename descclassname">geoparsepy.geo_parse_lib.</code><code class="sig-name descname">reverse_geocode_geom</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">list_geom</span></em>, <em class="sig-param"><span class="n">dict_geom_index</span></em>, <em class="sig-param"><span class="n">dict_geospatial_config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_parse_lib.html#reverse_geocode_geom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_parse_lib.reverse_geocode_geom" title="Permalink to this definition">¶</a></dt>
+<dd><p>reverse geocode a list of OpenGIS geom objects and return all indexed geoms that intersect with each geom in this list
+| note: if OSM tag info is specified in the dictGeomIndex then the geom with the highest admin level will be returned (i.e. most specific location returned, so road before suburb before city before country)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_geom</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – list of serialized OpenGIS geoms to geoparse</p></li>
+<li><p><strong>dict_geom_index</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – geom index from geo_parse_lib.calc_geom_index()</p></li>
+<li><p><strong>dict_geospatial_config</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – config object returned from geo_parse_lib.get_geoparse_config()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a set for each geom checked, with the set containing the ids of any intersecting geoms e.g. [ set( tuple_osmid1, tuple_osmid2 … ), … ]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">geoparsepy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, University of Southampton.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/source/geoparsepy.geo_parse_lib.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

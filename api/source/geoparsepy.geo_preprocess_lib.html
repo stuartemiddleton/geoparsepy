@@ -1,0 +1,336 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>geoparsepy.geo_preprocess_lib module &#8212; geoparsepy 2.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-geoparsepy.geo_preprocess_lib">
+<span id="geoparsepy-geo-preprocess-lib-module"></span><h1>geoparsepy.geo_preprocess_lib module<a class="headerlink" href="#module-geoparsepy.geo_preprocess_lib" title="Permalink to this headline">¶</a></h1>
+<p>Pre-processing module to create and populate SQL tables for focus areas from an installed OpenStreetMap database. Pre-processed SQL tables are required for geoparsepy.geo_parse_lib</p>
+<p>global focus area spec (required before focus area is preprocessed as it contains super region information):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+        <span class="s1">&#39;focus_area_id&#39;</span> <span class="p">:</span> <span class="s1">&#39;global_cities&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>focus area spec (OSM ID’s):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+        <span class="s1">&#39;focus_area_id&#39;</span> <span class="p">:</span> <span class="s1">&#39;gr_paris&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;osmid&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;relation&#39;</span><span class="p">,</span><span class="mi">71525</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">87002</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">86999</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">86985</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">85802</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">91776</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">72258</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">72148</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">31340</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">72020</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">85527</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">59321</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">37027</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">37026</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">104479</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">105122</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">105748</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">104868</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">108318</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">129550</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">130544</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">67826</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">67685</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">87628</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">87922</span><span class="p">],</span>
+        <span class="s1">&#39;admin_lookup_table&#39;</span> <span class="p">:</span> <span class="s1">&#39;global_cities_admin&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>focus area spec (name and super regions):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+        <span class="s1">&#39;focus_area_id&#39;</span> <span class="p">:</span> <span class="s1">&#39;southampton&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;admin&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;southampton&#39;</span><span class="p">,</span><span class="s1">&#39;south east england&#39;</span><span class="p">,</span> <span class="s1">&#39;united kingdom&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;admin_lookup_table&#39;</span> <span class="p">:</span> <span class="s1">&#39;global_cities_admin&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>focus area spec (radius from point):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+        <span class="s1">&#39;focus_area_id&#39;</span> <span class="p">:</span> <span class="s1">&#39;oxford&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;radius&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;POINT(-1.3176274 51.7503955)&#39;</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+        <span class="s1">&#39;admin_lookup_table&#39;</span> <span class="p">:</span> <span class="s1">&#39;global_cities_admin&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>focus area spec (geom):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+        <span class="s1">&#39;focus_area_id&#39;</span> <span class="p">:</span> <span class="s1">&#39;solent_shipping_lane&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;geom&#39;</span><span class="p">:</span> <span class="s1">&#39;POLYGON(( ... ))&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;admin_lookup_table&#39;</span> <span class="p">:</span> <span class="s1">&#39;global_cities_admin&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>focus area spec (places with only a point within a set of super regions):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+        <span class="s1">&#39;focus_area_id&#39;</span> <span class="p">:</span> <span class="s1">&#39;uk_places&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;place_types&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;suburb&#39;</span><span class="p">,</span><span class="s1">&#39;quarter&#39;</span><span class="p">,</span><span class="s1">&#39;neighbourhood&#39;</span><span class="p">,</span><span class="s1">&#39;town&#39;</span><span class="p">,</span><span class="s1">&#39;village&#39;</span><span class="p">,</span><span class="s1">&#39;island&#39;</span><span class="p">,</span><span class="s1">&#39;islet&#39;</span><span class="p">,</span><span class="s1">&#39;archipelago&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;parent_osmid&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;relation&#39;</span><span class="p">,</span><span class="mi">62149</span><span class="p">],</span>
+        <span class="s1">&#39;admin_lookup_table&#39;</span> <span class="p">:</span> <span class="s1">&#39;global_cities_admin&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="p">{</span>
+        <span class="s1">&#39;focus_area_id&#39;</span> <span class="p">:</span> <span class="s1">&#39;europe_places&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;place_types&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;suburb&#39;</span><span class="p">,</span><span class="s1">&#39;quarter&#39;</span><span class="p">,</span><span class="s1">&#39;neighbourhood&#39;</span><span class="p">,</span><span class="s1">&#39;town&#39;</span><span class="p">,</span><span class="s1">&#39;village&#39;</span><span class="p">,</span><span class="s1">&#39;island&#39;</span><span class="p">,</span><span class="s1">&#39;islet&#39;</span><span class="p">,</span><span class="s1">&#39;archipelago&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;parent_osmid&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;relation&#39;</span><span class="p">,</span><span class="mi">62149</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">1403916</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">1311341</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">295480</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">9407</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">50046</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">2323309</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">51477</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">365331</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">51701</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">2978650</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">54224</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">52822</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">62273</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">51684</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">79510</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">72594</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">72596</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">49715</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">59065</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">60189</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">16239</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">218657</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">21335</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">14296</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">214885</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">1741311</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">2528142</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">90689</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">58974</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">60199</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">53296</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">2088990</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">53292</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">53293</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">186382</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">192307</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">174737</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">307787</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">1124039</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">365307</span><span class="p">,</span> <span class="s1">&#39;relation&#39;</span><span class="p">,</span> <span class="mi">1278736</span><span class="p">],</span>
+        <span class="s1">&#39;admin_lookup_table&#39;</span> <span class="p">:</span> <span class="s1">&#39;global_cities_admin&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">note</span><span class="p">:</span> <span class="n">uk</span><span class="p">,</span> <span class="n">france</span><span class="p">,</span> <span class="n">spain</span><span class="p">,</span> <span class="n">portugal</span><span class="p">,</span> <span class="n">andorra</span><span class="p">,</span> <span class="n">denmark</span><span class="p">,</span> <span class="n">holland</span><span class="p">,</span> <span class="n">germany</span><span class="p">,</span> <span class="n">italy</span><span class="p">,</span> <span class="n">switzerland</span><span class="p">,</span> <span class="n">norway</span><span class="p">,</span> <span class="n">finland</span><span class="p">,</span> <span class="n">sweden</span><span class="p">,</span> <span class="n">ireland</span><span class="p">,</span> <span class="n">czech</span> <span class="n">republic</span><span class="p">,</span> <span class="n">estonia</span><span class="p">,</span> <span class="n">latvia</span><span class="p">,</span> <span class="n">lithuania</span><span class="p">,</span> <span class="n">poland</span><span class="p">,</span> <span class="n">belarus</span><span class="p">,</span> <span class="n">russia</span><span class="p">,</span> <span class="n">austria</span><span class="p">,</span> <span class="n">slovenia</span><span class="p">,</span> <span class="n">hungary</span><span class="p">,</span> <span class="n">slovakia</span><span class="p">,</span> <span class="n">croatia</span><span class="p">,</span> <span class="n">serbia</span><span class="p">,</span> <span class="n">bosnia</span> <span class="ow">and</span> <span class="n">herzegovina</span><span class="p">,</span> <span class="n">romania</span><span class="p">,</span> <span class="n">moldova</span><span class="p">,</span> <span class="n">ukraine</span><span class="p">,</span> <span class="n">montenegro</span><span class="p">,</span> <span class="n">kosovo</span><span class="p">,</span> <span class="n">albania</span><span class="p">,</span> <span class="n">macedonia</span><span class="p">,</span> <span class="n">bulgaria</span><span class="p">,</span> <span class="n">greece</span><span class="p">,</span> <span class="n">turkey</span><span class="p">,</span> <span class="n">cyprus</span><span class="p">,</span> <span class="n">monaco</span><span class="p">,</span> <span class="n">malta</span><span class="p">,</span> <span class="n">gibralta</span>
+</pre></div>
+</div>
+<p>focus area spec (global places with only a point):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+        <span class="s1">&#39;focus_area_id&#39;</span> <span class="p">:</span> <span class="s1">&#39;global_places&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;place_types&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;suburb&#39;</span><span class="p">,</span><span class="s1">&#39;quarter&#39;</span><span class="p">,</span><span class="s1">&#39;neighbourhood&#39;</span><span class="p">,</span><span class="s1">&#39;town&#39;</span><span class="p">,</span><span class="s1">&#39;village&#39;</span><span class="p">,</span><span class="s1">&#39;island&#39;</span><span class="p">,</span><span class="s1">&#39;islet&#39;</span><span class="p">,</span><span class="s1">&#39;archipelago&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;admin_lookup_table&#39;</span> <span class="p">:</span> <span class="s1">&#39;global_cities_admin&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>Performance notes:</dt><dd><ul class="simple">
+<li><p>Preprocesssing time is related to number of points/line/polygons (N) and number of admin regions (M). admin regions are cross-checked for containment so this there are N*M calculations to perform.</p></li>
+<li><p>global_cities (300,000 polygons) will take about 3 days to compute on a 2 GHz CPU (only need do it once of course).</p></li>
+<li><p>uk_places (20,000 points) takes 20 mins.</p></li>
+<li><p>france_places (40,000 points) take 2 hours.</p></li>
+<li><p>europe_places (420,000 points) is made up of each european country. this allows a sequential country-by-country calculation which reduced the size of M and is vastly quicker than global places. it takes 7 hours to compute.</p></li>
+<li><p>north_america_places (usa and canada) (52,000 points) takes 1 hour to compute.</p></li>
+<li><p>au_nz_places (australia and new zealand) (8,000 points) takes 3 mins to compute.</p></li>
+</ul>
+</dd>
+<dt>Alternative approach is OSM reverse geocoding using Nominatim:</dt><dd><ul class="simple">
+<li><p>Nominatim is a Linux GPL script/lib used by OSM to create an indexed planet OSM dataset that can then be looked up for reverse geocoding (i.e. name -&gt; OSMID)</p></li>
+<li><p>HTTP service available via OSM but this does not scale for large number of locations (as throughput is too slow)</p></li>
+<li><p>local deployment of Nominatim is possible but indexing is built into the planet OSM deployment scripts (i.e. takes 10+ days to run) and is apparently very complex and difficult to get working</p></li>
+<li><p>see <a class="reference external" href="http://wiki.openstreetmap.org/wiki/Nominatim">http://wiki.openstreetmap.org/wiki/Nominatim</a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py function">
+<dt id="geoparsepy.geo_preprocess_lib.cache_preprocessed_locations">
+<code class="sig-prename descclassname">geoparsepy.geo_preprocess_lib.</code><code class="sig-name descname">cache_preprocessed_locations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">database_handle</span></em>, <em class="sig-param"><span class="n">location_ids</span></em>, <em class="sig-param"><span class="n">schema</span></em>, <em class="sig-param"><span class="n">geospatial_config</span></em>, <em class="sig-param"><span class="n">timeout_statement</span><span class="o">=</span><span class="default_value">600</span></em>, <em class="sig-param"><span class="n">timeout_overall</span><span class="o">=</span><span class="default_value">600</span></em>, <em class="sig-param"><span class="n">spatial_filter</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_preprocess_lib.html#cache_preprocessed_locations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_preprocess_lib.cache_preprocessed_locations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a set of previously preprocessed locations from database. The cached location structure returned is used by geoparsepy.geo_parse_lib functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>database_handle</strong> (<em>PostgresqlHandler.PostgresqlHandler</em>) – handle to database object</p></li>
+<li><p><strong>location_ids</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – for each table the range of locations ids to load. A -1 for min or max indicates no min or max range. Use a range of (-1,-1) for all locations. e.g. { ‘focus1_admin’ : [nStartID,nEndID], … }</p></li>
+<li><p><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Postgres schema name under which tables will be created</p></li>
+<li><p><strong>geospatial_config</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – config object returned from a call to geoparsepy.geo_parse_lib.get_geoparse_config()</p></li>
+<li><p><strong>timeout_statement</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of seconds to allow each SQL statement</p></li>
+<li><p><strong>timeout_overall</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of seconds total to allow each SQL statement (including retries)</p></li>
+<li><p><strong>spatial_filter</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – OpenGIS spatial polygon to use as a spatial filter for returned locations (ST_Intersects used). This is optional and can be None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list structure containing location information to be used by geoparsepy.geo_parse_lib functions e.g. [loc_id,name,(osm_id,…),(admin_id,…),ST_AsText(geom),{<a class="reference external" href="tag:value">tag:value</a>},(variant_phrase, …)]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_preprocess_lib.create_preprocessing_tables">
+<code class="sig-prename descclassname">geoparsepy.geo_preprocess_lib.</code><code class="sig-name descname">create_preprocessing_tables</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">focus_area</span></em>, <em class="sig-param"><span class="n">database_handle</span></em>, <em class="sig-param"><span class="n">schema</span></em>, <em class="sig-param"><span class="n">table_point</span><span class="o">=</span><span class="default_value">'point'</span></em>, <em class="sig-param"><span class="n">table_line</span><span class="o">=</span><span class="default_value">'line'</span></em>, <em class="sig-param"><span class="n">table_poly</span><span class="o">=</span><span class="default_value">'poly'</span></em>, <em class="sig-param"><span class="n">table_admin</span><span class="o">=</span><span class="default_value">'admin'</span></em>, <em class="sig-param"><span class="n">timeout_statement</span><span class="o">=</span><span class="default_value">60</span></em>, <em class="sig-param"><span class="n">timeout_overall</span><span class="o">=</span><span class="default_value">60</span></em>, <em class="sig-param"><span class="n">delete_contents</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">logger</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_preprocess_lib.html#create_preprocessing_tables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_preprocess_lib.create_preprocessing_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>create preprocessing tables for a new focus area (if they do not already exist)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>focus_area</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – focus area description to create tables for.</p></li>
+<li><p><strong>database_handle</strong> (<em>PostgresqlHandler.PostgresqlHandler</em>) – handle to database object</p></li>
+<li><p><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Postgres schema name under which tables will be created</p></li>
+<li><p><strong>table_point</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Table name suffix to append to focus area ID to make point table</p></li>
+<li><p><strong>table_line</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Table name suffix to append to focus area ID to make line table</p></li>
+<li><p><strong>table_poly</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Table name suffix to append to focus area ID to make polygon table</p></li>
+<li><p><strong>table_admin</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Table name suffix to append to focus area ID to make admin region table</p></li>
+<li><p><strong>timeout_statement</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of seconds to allow each SQL statement</p></li>
+<li><p><strong>timeout_overall</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of seconds total to allow each SQL statement (including retries)</p></li>
+<li><p><strong>delete_contents</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – if True the contents of any existing tables will be deleted</p></li>
+<li><p><strong>logger</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/logging.html#logging.Logger" title="(in Python v3.7)"><em>logging.Logger</em></a>) – logger object (optional)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_preprocess_lib.execute_preprocessing_focus_area">
+<code class="sig-prename descclassname">geoparsepy.geo_preprocess_lib.</code><code class="sig-name descname">execute_preprocessing_focus_area</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">focus_area</span></em>, <em class="sig-param"><span class="n">database_pool</span></em>, <em class="sig-param"><span class="n">schema</span></em>, <em class="sig-param"><span class="n">table_point</span><span class="o">=</span><span class="default_value">'point'</span></em>, <em class="sig-param"><span class="n">table_line</span><span class="o">=</span><span class="default_value">'line'</span></em>, <em class="sig-param"><span class="n">table_poly</span><span class="o">=</span><span class="default_value">'poly'</span></em>, <em class="sig-param"><span class="n">table_admin</span><span class="o">=</span><span class="default_value">'admin'</span></em>, <em class="sig-param"><span class="n">timeout_statement</span><span class="o">=</span><span class="default_value">1209600</span></em>, <em class="sig-param"><span class="n">timeout_overall</span><span class="o">=</span><span class="default_value">1209600</span></em>, <em class="sig-param"><span class="n">logger</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_preprocess_lib.html#execute_preprocessing_focus_area"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_preprocess_lib.execute_preprocessing_focus_area" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populates preprocessing tables with locations for a new focus area. If the area has already been precomputed it will immediately return with the location ID range. Small areas (e.g. town) take a few minutes to compute. Large areas (e.g. city) take up to 1 hour to compute.
+The database tables will be SQL locked whilst the data import is occuring to ensure new locations are allocated continuous primary key IDs,
+allowing a simple result range (start ID and end ID) to be returned as opposed to a long list of IDs for each new location.</p>
+<p>This funciton is process safe but not thread safe as it uses an internal Queue() object to coordinate multiple database cursors and efficiently insert data using parallel SQL inserts.</p>
+<p>The global area (referenced using the focus area key ‘admin_lookup_table’) must be already created and available in the same schema as this new focus area.</p>
+<p>If the table already exists and already has locations then no import wil occur (assuming area has already been preprocessed).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>focus_area</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – focus area description</p></li>
+<li><p><strong>database_pool</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – pool of PostgresqlHandler.PostgresqlHandler objects for each of the 4 table types used to execute parallel SQL imports e.g. { ‘admin’ : PostgresqlHandler.PostgresqlHandler, … }</p></li>
+<li><p><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Postgres schema name under which tables will be created</p></li>
+<li><p><strong>table_point</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Table name suffix to append to focus area ID to make point table</p></li>
+<li><p><strong>table_line</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Table name suffix to append to focus area ID to make line table</p></li>
+<li><p><strong>table_poly</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Table name suffix to append to focus area ID to make polygon table</p></li>
+<li><p><strong>table_admin</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Table name suffix to append to focus area ID to make admin region table</p></li>
+<li><p><strong>timeout_statement</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of seconds to allow each SQL statement</p></li>
+<li><p><strong>timeout_overall</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of seconds total to allow each SQL statement (including retries)</p></li>
+<li><p><strong>logger</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/logging.html#logging.Logger" title="(in Python v3.7)"><em>logging.Logger</em></a>) – logger object (optional)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>for each table a tuple with the new location primary key ID range e.g. { ‘focus1_admin’ : (nLocIDStart, nLocIDEnd), … }</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_preprocess_lib.execute_preprocessing_global">
+<code class="sig-prename descclassname">geoparsepy.geo_preprocess_lib.</code><code class="sig-name descname">execute_preprocessing_global</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">global_area</span></em>, <em class="sig-param"><span class="n">database_pool</span></em>, <em class="sig-param"><span class="n">schema</span></em>, <em class="sig-param"><span class="n">table_point</span><span class="o">=</span><span class="default_value">'point'</span></em>, <em class="sig-param"><span class="n">table_line</span><span class="o">=</span><span class="default_value">'line'</span></em>, <em class="sig-param"><span class="n">table_poly</span><span class="o">=</span><span class="default_value">'poly'</span></em>, <em class="sig-param"><span class="n">table_admin</span><span class="o">=</span><span class="default_value">'admin'</span></em>, <em class="sig-param"><span class="n">timeout_statement</span><span class="o">=</span><span class="default_value">2000000</span></em>, <em class="sig-param"><span class="n">timeout_overall</span><span class="o">=</span><span class="default_value">2000000</span></em>, <em class="sig-param"><span class="n">logger</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_preprocess_lib.html#execute_preprocessing_global"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_preprocess_lib.execute_preprocessing_global" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populates preprocessing tables with locations for a global area (up to admin level 6). This can take a very long time (about 3 days on a 2GHz CPU) so the default database timeout values are large (e.g. 1209600).
+The database tables will be SQL locked whilst the data import is occuring to ensure new locations are allocated continuous primary key IDs,
+allowing a simple result range (start ID and end ID) to be returned as opposed to a long list of IDs for each new location.</p>
+<p>This funciton is process safe but not thread safe as it uses an internal Queue() object to coordinate multiple database cursors and efficiently insert data using parallel SQL inserts.</p>
+<p>A global area must be created before individual focus areas can be created since it will contain for each admin region all its super regions, calculated based on PostGIS geometry.</p>
+<p>If the table already exists and already has locations then no import will occur (assuming area has already been preprocessed).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>global_area</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – global area description</p></li>
+<li><p><strong>database_pool</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – pool of PostgresqlHandler.PostgresqlHandler objects for each of the 4 table types used to execute parallel SQL imports e.g. { ‘admin’ : PostgresqlHandler.PostgresqlHandler, … }</p></li>
+<li><p><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Postgres schema name under which tables will be created</p></li>
+<li><p><strong>table_point</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Table name suffix to append to focus area ID to make point table</p></li>
+<li><p><strong>table_line</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Table name suffix to append to focus area ID to make line table</p></li>
+<li><p><strong>table_poly</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Table name suffix to append to focus area ID to make polygon table</p></li>
+<li><p><strong>table_admin</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Table name suffix to append to focus area ID to make admin region table</p></li>
+<li><p><strong>timeout_statement</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of seconds to allow each SQL statement</p></li>
+<li><p><strong>timeout_overall</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of seconds total to allow each SQL statement (including retries)</p></li>
+<li><p><strong>logger</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/logging.html#logging.Logger" title="(in Python v3.7)"><em>logging.Logger</em></a>) – logger object (optional)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>for each table a tuple with the new location primary key ID range e.g. { ‘global_admin’ : (nLocIDStart, nLocIDEnd), … }</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_preprocess_lib.get_point_for_osmid">
+<code class="sig-prename descclassname">geoparsepy.geo_preprocess_lib.</code><code class="sig-name descname">get_point_for_osmid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">osm_id</span></em>, <em class="sig-param"><span class="n">osm_type</span></em>, <em class="sig-param"><span class="n">geom</span></em>, <em class="sig-param"><span class="n">database_handle</span></em>, <em class="sig-param"><span class="n">timeout_statement</span><span class="o">=</span><span class="default_value">60</span></em>, <em class="sig-param"><span class="n">timeout_overall</span><span class="o">=</span><span class="default_value">60</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_preprocess_lib.html#get_point_for_osmid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_preprocess_lib.get_point_for_osmid" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate a representative point for a OSMID. if its a relation lookup the admin centre, capital or label node members. if its a node use that point. otherwise use shapely lib to calc a centroid point for this polygon.
+this function requires a database connection to OSM planet database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>osm_id</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – OSM ID of a relation, way or node</p></li>
+<li><p><strong>osm_type</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – OSM Type as returned by geoparsepy.geo_parse_lib.calc_OSM_type()</p></li>
+<li><p><strong>geom</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – OpenGIS geometry for OSM ID</p></li>
+<li><p><strong>database_handle</strong> (<em>PostgresqlHandler.PostgresqlHandler</em>) – handle to database object connected to OSM database (with tables public.planet_osm_point and public.planet_osm_rels available)</p></li>
+<li><p><strong>timeout_statement</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of seconds to allow each SQL statement</p></li>
+<li><p><strong>timeout_overall</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of seconds total to allow each SQL statement (including retries)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>coordinates (long, lat) for a point that represents this OSM ID well (e.g. admin centre or centroid)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="geoparsepy.geo_preprocess_lib.thread_worker_sql_insert">
+<code class="sig-prename descclassname">geoparsepy.geo_preprocess_lib.</code><code class="sig-name descname">thread_worker_sql_insert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sql_list</span></em>, <em class="sig-param"><span class="n">sql_result_queue_dict</span></em>, <em class="sig-param"><span class="n">logger</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geoparsepy/geo_preprocess_lib.html#thread_worker_sql_insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geoparsepy.geo_preprocess_lib.thread_worker_sql_insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Internal thread callback function to preprocess a new area. This function should nenver be called independantly of the execute_preprocessing_global() or execute_preprocessing_focus_area() functions.</p>
+<p>All sql imports in list must be for the same database as we lock that database for the entire transaction to ensure inserted location IDs are sequential.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sql_list</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – list of info required to execute sql query e.g. [ (‘focus1_admin’,sql_query_str,tuple_sql_data,logger,database_handle,timeout_statement,timeout_overall), … ]</p></li>
+<li><p><strong>sql_result_queue_dict</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – dict of Queue() instances for each table type to store SQL results in a thread safe way e.g. { ‘focus1_admin’ : Queue(), … }</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">geoparsepy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, University of Southampton.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/source/geoparsepy.geo_preprocess_lib.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
