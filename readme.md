@@ -40,9 +40,8 @@ A benchmark geoparse dataset is also available for free from the University of S
 
 # geoparsepy documentation resources
 
-geoparsepy [API](https://github.com/stuartemiddleton/geoparsepy/api)
+geoparsepy [API](https://www.southampton.ac.uk/~sem03/geoparsepy/api/index.html)
 geoparsepy example code on [github](https://github.com/stuartemiddleton/geoparsepy)
-
 
 # Python libs needed (earlier versions may be suitable but are untested)
 
@@ -51,7 +50,9 @@ Database: PostgreSQL >= 11.3, PostGIS >= 2.5
 
 For LINUX deployments the following is needed:
 
-> sudo apt-get install libgeos-dev libgeos-3.4.2 libpq-dev
+```
+sudo apt-get install libgeos-dev libgeos-3.4.2 libpq-dev
+```
 
 You will need to download NLTK corpra before running geoparsepy:
 
@@ -62,10 +63,16 @@ nltk.download()
 ==> install all or at least stopwords, names and wordnet
 ```
 
+# Installation
+
+python3 -m pip install geoparsepy
+
 # Databases needed for geoparsing
 Download pre-processed SQL table dumps from OSM image dated dec 2019
 
-> [geoparsepy_preprocessed_tables.tar.gz](https://www.southampton.ac.uk/~sem03/geoparsepy/geoparsepy_preprocessed_tables.tar.gz) 1.4 GB
+```
+[geoparsepy_preprocessed_tables.tar.gz](https://www.southampton.ac.uk/~sem03/geoparsepy/geoparsepy_preprocessed_tables.tar.gz) 1.4 GB
+```
 
 Connect to PostgreSQL and create the database with the required PostGIS and hstore extensions
 
