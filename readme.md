@@ -1,29 +1,23 @@
-
-| Host | URI |
-| :--- | :--- |
-| Internal GitHub | https://git.soton.ac.uk/nlp/geoparsepy.git |
-| Public PyPI | https://pypi.python.org/pypi/geoparsepy |
-
 # geoparsepy project
 
 geoparsepy is a Python geoparsing library that will extract and disambiguate locations from text. It uses a local OpenStreetMap database which allows very high and unlimited geoparsing throughput, unlike approaches that use a third-party geocoding service (e.g.  Google Geocoding API).
 
 Geoparsing is based on named entity matching against OpenStreetMap (OSM) locations. All locations with names that match tokens will be selected from a target text sentence. This will result in a set of OSM locations, all with a common name or name variant, for each token in the text. Geoparsing included the following features:
-..* **token expansion** using location name variants (i.e. OSM multi-lingual names, short names and acronyms)
-..* **token expansion** using location type variants (e.g. street, st.)
-..* **token filtering** of single token location names against WordNet (non-nouns), language specific stoplists and peoples first names (nltk.corpus.names.words()) to reduce false positive matches
-..* **prefix checking** when matching in case a first name prefixes a location token(s) to avoid matching peoples full names as locations (e.g. Victoria Derbyshire != Derbyshire)
+  * **token expansion** using location name variants (i.e. OSM multi-lingual names, short names and acronyms)
+  * **token expansion** using location type variants (e.g. street, st.)
+  * **token filtering** of single token location names against WordNet (non-nouns), language specific stoplists and peoples first names (nltk.corpus.names.words()) to reduce false positive matches
+  * **prefix checking** when matching in case a first name prefixes a location token(s) to avoid matching peoples full names as locations (e.g. Victoria Derbyshire != Derbyshire)
 
 Location disambiguation is the process of choosing which of a set of possible OSM locations, all with the same name, is the best match. Location disambiguation is based on an evidential approach, with evidential features detailed below in order of importance:
-..* **token subsumption**, rejecting smaller phrases over larger ones (e.g. 'New York' will prefer [New York, USA] to [York, UK])
-..* **nearby parent region**, preferring locations with a parent region also appearing within a semantic distance (e.g. 'New York in USA' will prefer [New York, USA] to [New York, BO, Sierra Leone])
-..* **nearby locations**, preferring locations with closeby or overlapping locations within a semantic distance (e.g. 'London St and Commercial Road' will select from road name choices with the same name based on spatial proximity)
-..* **nearby geotag**, preferring locations that are closeby or overlapping a geotag
-..* **general before specific**, rejecting locations with a higher admin level (or no admin level at all) compared to locations with a lower admin level (e.g. 'New York' will prefer [New York, USA] to [New York, BO, Sierra Leone]
+  * **token subsumption**, rejecting smaller phrases over larger ones (e.g. 'New York' will prefer [New York, USA] to [York, UK])
+  * **nearby parent region**, preferring locations with a parent region also appearing within a semantic distance (e.g. 'New York in USA' will prefer [New York, USA] to [New York, BO, Sierra Leone])
+  * **nearby locations**, preferring locations with closeby or overlapping locations within a semantic distance (e.g. 'London St and Commercial Road' will select from road name choices with the same name based on spatial proximity)
+  * **nearby geotag**, preferring locations that are closeby or overlapping a geotag
+  * **general before specific**, rejecting locations with a higher admin level (or no admin level at all) compared to locations with a lower admin level (e.g. 'New York' will prefer [New York, USA] to [New York, BO, Sierra Leone]
 
 Currently the following languages are supported:
-..* English, French, German, Italian, Portuguese, Russian, Ukrainian
-..* All other languages will work but there will be no language specific token expansion available
+  * English, French, German, Italian, Portuguese, Russian, Ukrainian
+  * All other languages will work but there will be no language specific token expansion available
 
 geoparsepy works with Python 3.7 and has been tested on Windows 10 and Ubuntu 18.04 LTS.
 
@@ -428,15 +422,15 @@ loading gazeteer from /home/sem/.local/lib/python3.7/site-packages/geoparsepy/ga
 starting focus area southampton
 starting preprocessing of new focus area : {'focus_area_id': 'southampton', 'admin': ['southampton', 'south east england', 'united kingdom'], 'admin_lookup_table': 'global_cities_admin'}
 starting SQL threads
-start SQL (point x 2) ...
-start SQL (line x 2) ...
-start SQL (poly x 2) ...
-start SQL (admin x 2) ...
+start SQL (point x 2)   .
+start SQL (line x 2)   .
+start SQL (poly x 2)   .
+start SQL (admin x 2)   .
 waiting for joins
-... end SQL (admin x 2) ...
-... end SQL (point x 2) ...
-... end SQL (line x 2) ...
-... end SQL (poly x 2) ...
+  . end SQL (admin x 2)   .
+  . end SQL (point x 2)   .
+  . end SQL (line x 2)   .
+  . end SQL (poly x 2)   .
 join successful
 finished focus area southampton
 location id range : {'southampton_point': (1, 1327), 'southampton_line': (1, 2144), 'southampton_poly': (1, 2748), 'southampton_admin': (1, 7)}
