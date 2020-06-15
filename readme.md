@@ -41,11 +41,13 @@ A benchmark geoparse dataset is also available for free from the University of S
 # geoparsepy documentation resources
 
 geoparsepy [API](https://www.southampton.ac.uk/~sem03/geoparsepy/api/index.html)
+
 geoparsepy example code on [github](https://github.com/stuartemiddleton/geoparsepy)
 
 # Python libs needed (earlier versions may be suitable but are untested)
 
 Python libs: psycopg2 >= 2.8, nltk >= 3.4, numpy >= 1.18, shapely >= 1.6, setuptools >= 46, soton-corenlppy>=1.0
+
 Database: PostgreSQL >= 11.3, PostGIS >= 2.5
 
 For LINUX deployments the following is needed:
