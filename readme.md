@@ -2,6 +2,8 @@
 
 geoparsepy is a Python geoparsing library that will extract and disambiguate locations from text. It uses a local OpenStreetMap database which allows very high and unlimited geoparsing throughput, unlike approaches that use a third-party geocoding service (e.g.  Google Geocoding API).
 
+[geoparsepy PyPI](https://pypi.org/project/geoparsepy/)
+
 Geoparsing is based on named entity matching against OpenStreetMap (OSM) locations. All locations with names that match tokens will be selected from a target text sentence. This will result in a set of OSM locations, all with a common name or name variant, for each token in the text. Geoparsing included the following features:
   * **token expansion** using location name variants (i.e. OSM multi-lingual names, short names and acronyms)
   * **token expansion** using location type variants (e.g. street, st.)
