@@ -45,7 +45,7 @@ geoparsepy example code on [github](https://github.com/stuartemiddleton/geoparse
 
 # Python libs needed (earlier versions may be suitable but are untested)
 
-Python libs: psycopg2 >= 2.8, nltk >= 3.4, numpy >= 1.18, shapely >= 1.6, setuptools >= 46
+Python libs: psycopg2 >= 2.8, nltk >= 3.4, numpy >= 1.18, shapely >= 1.6, setuptools >= 46, soton-corenlppy>=1.0
 Database: PostgreSQL >= 11.3, PostGIS >= 2.5
 
 For LINUX deployments the following is needed:
