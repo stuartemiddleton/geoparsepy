@@ -70,9 +70,7 @@ python3 -m pip install geoparsepy
 # Databases needed for geoparsing
 Download pre-processed SQL table dumps from OSM image dated dec 2019
 
-```
 [geoparsepy_preprocessed_tables.tar.gz](https://www.southampton.ac.uk/~sem03/geoparsepy/geoparsepy_preprocessed_tables.tar.gz) 1.4 GB
-```
 
 Connect to PostgreSQL and create the database with the required PostGIS and hstore extensions
 
