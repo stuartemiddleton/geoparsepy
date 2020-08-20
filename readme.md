@@ -72,9 +72,13 @@ nltk.download()
 python3 -m pip install geoparsepy
 
 # Databases needed for geoparsing
-Download pre-processed SQL table dumps from OSM image dated dec 2019
+Download pre-processed SQL table dumps from OSM image dated dec 2019. SQL dump is a 1.6 GB tar/zip file created using pg_dump and zipped using 7Zip. Use curl to download as some web browsers have file size limits on downloads.
 
-[geoparsepy_preprocessed_tables.tar.zip](https://www.southampton.ac.uk/~sem03/geoparsepy/geoparsepy_preprocessed_tables.tar.zip) 1.6 GB tar/zip file of pg_dump SQL output created using 7Zip
+```
+curl "https://www.southampton.ac.uk/~sem03/geoparsepy/geoparsepy_preprocessed_tables.tar.zip" -o "geoparsepy_preprocessed_tables.tar.zip"
+unzip geoparsepy_preprocessed_tables.tar.zip
+tar -xvf geoparsepy_preprocessed_tables.tar
+```
 
 Connect to PostgreSQL and create the database with the required PostGIS and hstore extensions
 
