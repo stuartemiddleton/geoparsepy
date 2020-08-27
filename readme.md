@@ -72,7 +72,7 @@ nltk.download()
 python3 -m pip install geoparsepy
 
 # Databases needed for geoparsing
-Download pre-processed SQL table dumps from OSM image dated dec 2019. SQL dump is a 1.6 GB tar/zip file created using pg_dump and zipped using 7Zip.
+Download pre-processed UTF-8 encoded SQL table dumps from OSM image dated dec 2019. SQL dump is a 1.6 GB tar/zip file created using pg_dump and zipped using 7Zip tool.
 
 ```
 download zip file from Google drive https://drive.google.com/file/d/1xyCjQox6gCoN8e0upHHyeMLV-uLirthS/view?usp=sharing
@@ -94,10 +94,17 @@ CREATE EXTENSION IF NOT EXISTS hstore;
 Import the precomputed database tables for global cities and places
 
 ```
-psql -d openstreetmap -f global_cities.sql
-psql -d openstreetmap -f uk_places.sql
-psql -d openstreetmap -f north_america_places.sql
-psql -d openstreetmap -f europe_places.sql
+# Linux
+psql -U postgres -d openstreetmap -f global_cities.sql
+psql -U postgres -d openstreetmap -f uk_places.sql
+psql -U postgres -d openstreetmap -f north_america_places.sql
+psql -U postgres -d openstreetmap -f europe_places.sql
+
+# Windows 10 using powershell
+& 'C:\Program Files\PostgreSQL\11\bin\psql.exe' -U postgres -d openstreetmap -f global_cities.sql
+& 'C:\Program Files\PostgreSQL\11\bin\psql.exe' -U postgres -d openstreetmap -f uk_places.sql
+& 'C:\Program Files\PostgreSQL\11\bin\psql.exe' -U postgres -d openstreetmap -f north_america_places.sql
+& 'C:\Program Files\PostgreSQL\11\bin\psql.exe' -U postgres -d openstreetmap -f europe_places.sql
 ```
 
 # Example code geoparse (start here)
