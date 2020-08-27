@@ -72,7 +72,7 @@ nltk.download()
 python3 -m pip install geoparsepy
 
 # Databases needed for geoparsing
-Download pre-processed UTF-8 encoded SQL table dumps from OSM image dated dec 2019. SQL dump is a 1.6 GB tar/zip file created using pg_dump and zipped using 7Zip tool.
+Download pre-processed UTF-8 encoded SQL table dumps from OSM image dated dec 2019. SQL dump is a 1.2 GB tar/zip file created using pg_dump and zipped using 7Zip tool.
 
 ```
 download zip file from Google drive https://drive.google.com/file/d/1xyCjQox6gCoN8e0upHHyeMLV-uLirthS/view?usp=sharing
