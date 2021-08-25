@@ -456,7 +456,9 @@ finished focus area southampton
 location id range : {'southampton_point': (1, 1327), 'southampton_line': (1, 2144), 'southampton_poly': (1, 2748), 'southampton_admin': (1, 7)}
 ```
 
-# Exact setup I have used for unit testing of postgres and postgis on Ubuntu 20.04 LTS for user sem03. The username 'sem' in the geoparsepy sql dump is changed to 'sem03' as this is my linux box username. You can use whatever username you need, but the examples assume postgres for simplicity (so you will need to change PostgresqlHandler arguments). The psql configuration is similar to that needed for a full OSM deployment.
+# Example psql setup on Ubuntu 20.04 LTS
+
+Below is the exact setup used for unit testing of postgres and postgis on Ubuntu 20.04 LTS for user 'sem03'. The username 'sem' in the geoparsepy sql dump is changed to 'sem03' as this is my linux box username. You can use whatever username you need, but the examples assume postgres for simplicity (so you will need to change PostgresqlHandler arguments). The psql configuration is similar to that needed for a full OSM deployment.
 
 ```
 sudo apt list --installed | grep post
