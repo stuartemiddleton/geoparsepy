@@ -106,7 +106,7 @@ psql -U postgres -d openstreetmap -f europe_places.sql
 & 'C:\Program Files\PostgreSQL\11\bin\psql.exe' -U postgres -d openstreetmap -f north_america_places.sql
 & 'C:\Program Files\PostgreSQL\11\bin\psql.exe' -U postgres -d openstreetmap -f europe_places.sql
 
-# Lunix if username not sem (used for sql dump) not added as a user and some other name is needed (e.g. sem03)
+# Linux if username not sem (used for sql dump) not added as a user and some other name is needed (e.g. sem03)
 find * -name \*.sql -exec sed -i "s/TO sem;/TO sem03;/g" {} \;
 psql -d openstreetmap -f uk_places.sql
 psql -d openstreetmap -f global_cities.sql
