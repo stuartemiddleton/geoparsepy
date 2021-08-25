@@ -455,3 +455,63 @@ join successful
 finished focus area southampton
 location id range : {'southampton_point': (1, 1327), 'southampton_line': (1, 2144), 'southampton_poly': (1, 2748), 'southampton_admin': (1, 7)}
 ```
+
+# Exact setup I have used for unit testing of postgres and postgis on Ubuntu 20.04 LTS for user sem03. The username 'sem' in the geoparsepy sql dump is changed to 'sem03' as this is my linux box username. You can use whatever username you need, but the examples assume postgres for simplicity (so you will need to change PostgresqlHandler arguments). The psql configuration is similar to that needed for a full OSM deployment.
+
+```
+sudo apt list --installed | grep post
+sudo apt-get remove --purge postgresql-12
+sudo apt-get remove --purge postgresql-12-postgis-2.4-scripts
+sudo apt-get remove --purge postgis
+sudo apt-cache search postgis
+sudo apt-get install python3-apt
+sudo apt-get install postgresql-12-postgis-3
+
+pg_config --version
+psql --version
+
+sudo /etc/init.d/postgresql stop
+sudo /etc/init.d/postgresql status
+
+sudo nano /etc/postgresql/12/main/pg_hba.conf
+	host    all             all             127.0.0.1/32            md5
+	host    all             all             127.0.0.1/32            trust
+
+sudo nano /etc/postgresql/12/main/postgresql.conf
+	listen_addresses = '*'
+	shared_buffers = 512MB
+	work_mem = 512MB
+	maintenance_work_mem = 2GB
+	max_worker_processes = 16
+	max_parallel_workers_per_gather = 8
+	max_parallel_workers = 16
+	constraint_exclusion = partition
+
+sudo /etc/init.d/postgresql start
+sudo /etc/init.d/postgresql status
+
+sudo -u postgres createdb openstreetmap
+sudo -u postgres psql -d openstreetmap -c 'CREATE EXTENSION postgis; CREATE EXTENSION hstore;'
+sudo -u postgres psql -d openstreetmap -c "SELECT * FROM information_schema.tables WHERE table_schema = 'public'"
+
+sudo -u postgres psql
+CREATE USER sem03 with PASSWORD 'sem03';
+GRANT ALL PRIVILEGES ON DATABASE openstreetmap to sem03;
+\q
+
+sudo -u postgres psql -d openstreetmap
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO sem03;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public to sem03;
+GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public to sem03;
+\q
+
+psql -d openstreetmap -c "SELECT * FROM information_schema.tables WHERE table_schema = 'public'"
+
+find * -name \*.sql -exec sed -i "s/TO sem;/TO sem03;/g" {} \;
+psql -d openstreetmap -f uk_places.sql
+psql -d openstreetmap -f global_cities.sql
+psql -d openstreetmap -f north_america_places.sql
+psql -d openstreetmap -f europe_places.sql
+
+psql -d openstreetmap -c "SELECT * FROM information_schema.tables WHERE table_schema = 'public'"
+```
